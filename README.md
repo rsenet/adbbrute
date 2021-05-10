@@ -42,6 +42,23 @@ Try 0000
 PIN identified: 0000
 ```
 
+## Enable USB-Debugging
+
+### Via GUI:
+
+Go to **Settings** > **About phone** and press on **build number** 7 times to enable developper mode.
+
+Once enabled, go to **Settings** > **Developer options** and enable **USB debugging**
+
+
+### Via ADB:
+
+```bash
+adb shell settings put global development_settings_enabled 1
+adb shell setprop persist.service.adb.enable 1
+```
+
+
 ## Author
 
 Régis SENET ([rsenet](https://github.com/rsenet))
