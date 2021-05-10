@@ -29,7 +29,7 @@ $ python3 ADBBrute.py
 Finally, you need to specify the supported bruteforce methods:
 
 * gui
-* locksettings (not implemented yet)
+* locksettings
 
 Once specified, you just have to wait few time to get your Android PIN:
 
