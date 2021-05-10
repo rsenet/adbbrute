@@ -39,6 +39,7 @@ $ python3 ADBBrute.py --device 192.168.57.109:5555 --type gui
 Try 1234
 Try 1111
 Try 0000
+PIN identified: 0000
 ```
 
 ## Author
