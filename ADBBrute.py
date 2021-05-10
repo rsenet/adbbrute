@@ -30,7 +30,7 @@ try:
                     brute.start_gui_bf(device)
 
                 if typebf == "locksettings":
-                    print("Not implemented yet")
+                    brute.start_locksettings_bf(device)
 
             else:
                 print("[x] Device does not exists - Leaving")

