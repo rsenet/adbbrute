@@ -22,7 +22,7 @@ def display_connected_device():
     """
     adb = get_connected_devices()
 
-    for device in adb.devices():
+    for device in adb.list():
         print(" - %s" % device.serial)
 
 
