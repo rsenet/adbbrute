@@ -3,14 +3,17 @@ from lib import brute
 import argparse
 
 __author__  = 'Regis SENET'
-__email__   = 'regis.senet@bssi.fr'
+__contrib__ = 'Théo G'
+__email__   = 'regis.senet@orhus.fr'
 __git__     = 'https://github.com/rsenet/adbbrute'
-__version__ = '0.1'
+__version__ = '0.2'
 short_desc  = "Android LockScreen Bruteforce"
 
 arg_parser = argparse.ArgumentParser(description=short_desc)
 arg_parser.add_argument('--device', help="Specify the device to bruteforce ")
 arg_parser.add_argument('--type', help="Type of bruteforce (gui / locksettings)")
+arg_parser.add_argument('--bf', action='store_true', help="Without trying common pins")
+arg_parser.add_argument('--virtual', action='store_true', help="Virtual device")
 u_args = arg_parser.parse_args()
 device = u_args.device
 typebf = u_args.type
@@ -27,10 +30,10 @@ try:
                 brute.show_device_info(device)
 
                 if typebf == "gui":
-                    brute.start_gui_bf(device)
+                    brute.start_gui_bf(device, u_args)
 
                 if typebf == "locksettings":
-                    brute.start_locksettings_bf(device)
+                    brute.start_locksettings_bf(device, u_args)
 
             else:
                 print("[x] Device does not exists - Leaving")
